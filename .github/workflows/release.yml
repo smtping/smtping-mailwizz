@@ -1,0 +1,28 @@
+name: Release zip
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: PHP syntax
+        run: find smtping-email-verifier -name '*.php' -print0 | xargs -0 -n1 php -l
+      - name: Build zip
+        run: zip -r smtping-email-verifier.zip smtping-email-verifier
+      - name: Attach zip to release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" smtping-email-verifier.zip --clobber
