@@ -6,7 +6,7 @@
 class SmtpingEmailVerifierExtClient
 {
     const BASE_URL = 'https://api.smtping.com/api/v1';
-    const USER_AGENT = 'smtping-mailwizz/1.0.0';
+    const USER_AGENT = 'smtping-mailwizz/1.0.1';
     const BULK_MAX = 100000;
 
     const SAFE = ['valid', 'alias'];
