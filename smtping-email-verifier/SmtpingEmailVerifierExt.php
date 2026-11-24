@@ -15,7 +15,7 @@ class SmtpingEmailVerifierExt extends ExtensionInit
 {
     public $name = 'SMTPing Email Verifier';
     public $description = 'Block invalid, spamtrap, disposable and other risky addresses on subscribe and import, and verify existing lists in bulk with SMTPing.';
-    public $version = '1.0.0';
+    public $version = '1.0.1';
     public $minAppVersion = '2.0.0';
     public $author = 'SMTPing';
     public $website = 'https://smtping.com/';
