@@ -132,7 +132,7 @@ class SmtpingEmailVerifierExtBackendSettingsController extends ExtensionControll
                     continue;
                 }
                 $st = (string)($row['status'] ?? 'unknown');
-                $band = SmtpingEmailVerifierExtClient::band($st);
+                $band = SmtpingEmailVerifierExtClient::bandOf($row);
                 SmtpingEmailVerifierExtCache::set($email, $st, $band);
                 $counts[$band]++;
                 if (in_array($band, $blocked, true) && method_exists('EmailBlacklist', 'addToBlacklist')) {
