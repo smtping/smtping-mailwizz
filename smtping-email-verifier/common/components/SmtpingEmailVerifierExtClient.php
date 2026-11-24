@@ -10,7 +10,7 @@ class SmtpingEmailVerifierExtClient
     const BULK_MAX = 100000;
 
     const SAFE = ['valid', 'alias'];
-    const AVOID = ['invalid', 'spamtrap', 'disposable', 'blacklisted', 'complainer', 'spambot', 'inbox_full'];
+    const AVOID = ['invalid', 'spamtrap', 'disposable', 'blacklisted', 'complainer', 'spambot', 'inbox_full', 'no_reply'];
 
     /** @var string */
     private $apiKey;
@@ -35,12 +35,19 @@ class SmtpingEmailVerifierExtClient
         return 'judgement';
     }
 
+    /** The band decided by the API, or derived from the status when the row has none. */
+    public static function bandOf(array $row): string
+    {
+        $band = $row['band'] ?? null;
+        return in_array($band, ['safe', 'avoid', 'judgement'], true) ? $band : self::band(isset($row['status']) ? (string)$row['status'] : null);
+    }
+
     /** @return array{status: string, band: string} */
     public function verify(string $email): array
     {
         $r = $this->request('POST', '/verify/single', ['email' => $email]);
         $status = (string)($r['status'] ?? 'unknown');
-        return ['status' => $status, 'band' => self::band($status)];
+        return ['status' => $status, 'band' => self::bandOf($r)];
     }
 
     /**
@@ -77,8 +84,9 @@ class SmtpingEmailVerifierExtClient
                 curl_close($ch);
                 if ($code >= 200 && $code < 300) {
                     $data = json_decode($body, true);
+                    $data = is_array($data) ? $data : [];
                     $status = (string)($data['status'] ?? 'unknown');
-                    $out[$email] = ['status' => $status, 'band' => self::band($status)];
+                    $out[$email] = ['status' => $status, 'band' => self::bandOf($data)];
                 } elseif ($code === 401 || $code === 403 || $code === 402) {
                     curl_multi_close($mh);
                     return $out;
